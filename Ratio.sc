@@ -6,6 +6,7 @@ Ratio {
 		^super.newCopyArgs(num, den, description, fav, ratioAsString).initRatio
 	}
 
+	// ***** Instance method: initRatio
 	initRatio {
 		if(ratioAsString.notNil, {
 			if(ratioAsString.contains("/"), {
@@ -22,32 +23,39 @@ Ratio {
 		});
 	}
 
+	// ***** Instance method: copy
 	copy {
 		^Ratio(num, den);
 	}
 
+	// ***** Instance method: num_
 	num_{|val|
 		num = val.asInteger
 	}
 
+	// ***** Instance method: den_
 	den_{|val|
 		den = val.asInteger
 	}
 
+	// ***** Instance method: print
 	print {
 		var str = num.asString ++ "/" ++ den.asString;
 
 		^str
 	}
 
+	// ***** Instance method: asNum
 	asNum {
 		^(num / den)
 	}
 
+	// ***** Instance method: asString
 	asString {
 		^this.print()
 	}
 
+	// ***** Instance method: asMIDI
 	asMIDI {
 		var nn, dev;
 
@@ -59,6 +67,7 @@ Ratio {
 		^[nn, dev]
 	}
 
+	// ***** Instance method: getLimit
 	getLimit { | num, den |
 		var numLimit, denLimit;
 		var numFactors = num.factors.reverse;
@@ -83,6 +92,7 @@ Ratio {
 		});
 	}
 
+	// ***** Instance method: getLimit
 	multiply {|am|
 		if(am.class == Ratio, {
 			^Ratio(num * am.num, den * am.den).simplify
@@ -93,6 +103,7 @@ Ratio {
 		});
 	}
 
+	// ***** Instance method: divide
 	divide {|am|
 		if(am.class == Ratio, {
 			^Ratio(num * am.den, den * am.num).simplify
@@ -103,6 +114,7 @@ Ratio {
 		})
 	}
 
+	// ***** Instance method: add
 	add {|am|
 		if(am.class == Ratio, {
 			^Ratio(
@@ -123,6 +135,7 @@ Ratio {
 	/ {|am| ^this.divide(am) }
 	* {|am| ^this.multiply(am) }
 
+	// ***** Instance method: simplify
 	simplify {
 		var div = gcd(num, den);
 		num = num.div(div);
@@ -130,10 +143,12 @@ Ratio {
 		^this
 	}
 
+	// ***** Instance method: pow
 	pow {|aInteger|
 		^Ratio(num.pow(aInteger.asInteger).asInteger, den.pow(aInteger.asInteger).asInteger)
 	}
 
+	// ***** Instance method: forceOctave
 	forceOctave {
 		while({den > num}, {
 			num = num * 2
@@ -144,16 +159,30 @@ Ratio {
 		^this.simplify()
 	}
 
+	// ***** Instance method: invert
 	invert { ^Ratio(den, num) }
 
+	// ***** Instance method: am
 	am {
+		// arithmetic mean
 		^this.add(1).divide(2).simplify()
 	}
-
+	// ***** Instance method: hm
 	hm {
+		// harmonic mean
 		^this.multiply(2).divide(this.add(1)).simplify()
 	}
-
+	// ***** Instance method: dt
+	dt {
+		// difference tone
+		^Ratio(num - den, den)
+	}
+	// ***** Instance method: st
+	st {
+		// sum tone
+		^Ratio(num + den, den).simplify
+	}
+	// ***** Instance method: collectionWithCommonDen
 	collectionWithCommonDen {|aList|
 		var mult = [];
 		var new = [];
@@ -178,6 +207,7 @@ Ratio {
 		^this.simplifyCollectionCommonDenominator(new);
 	}
 
+	// ***** Instance method: simplifyCollectionCommonDenominator	
 	simplifyCollectionCommonDenominator {|aList|
 		var numbers = [aList[0].den] ++ aList.collect{|r| r.num};
 		var den = numbers[0];
@@ -189,6 +219,7 @@ Ratio {
 		^aList.collect{|item| Ratio(item.num.div(den), item.den.div(den))}
 	}
 
+	// ***** Instance method: collectionAsHarmonics
 	collectionAsHarmonics {|aList|
 		var mult = [];
 		var harm = [];
@@ -212,6 +243,7 @@ Ratio {
 		^this.simplifyHarmonics(harm)
 	}
 
+	// ***** Instance method: simplifyHarmonics	
 	simplifyHarmonics {|aList|
 		var den = aList[0];
 
@@ -222,3 +254,7 @@ Ratio {
 		^aList.collect{|item| item.div(den)}
 	}
 }
+
+// Local variables:
+// eval: (outshine-mode t)
+// End:
