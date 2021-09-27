@@ -1,0 +1,87 @@
+TITLE:: Ratio
+summary:: Helper class for working with JI ratios in SuperCollider
+categories:: Utilities
+
+DESCRIPTION::
+
+When working with musical ratios in SuperCollider, it can get a bit teadious
+that SuperCollider always calculates the value of each ratio, i.e code::5/4:: is
+always interpreted as code::1.25::.
+
+There is then no way to go back and see what the numerator and denominator was,
+and if you want to be careful about limits you can't easily see what limit your
+intervals are. This class is an attempt at making working with musical ratios a
+bit more intuitive.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+
+ARGUMENT:: num
+The ratio numerator.
+
+ARGUMENT:: den
+The ratio denominator.
+
+ARGUMENT:: description
+A string that describes the ratio.
+
+ARGUMENT:: fav
+Whether or not the ratio is a favourite -- used in conjunction with my code::ji-trainer.scd:: patch.
+
+ARGUMENT:: ratioAsString
+The ratio, written as a string, i.e code::"5/4"::.
+
+returns:: A Ratio.
+
+
+INSTANCEMETHODS::
+
+private:: getLimit
+
+private:: initRatio
+
+private:: ratioAsString
+
+METHOD:: fav
+
+returns:: 1 if favourite, 0 if not.
+
+METHOD:: num
+
+returns:: The numerator.
+
+METHOD:: den
+
+returns:: The denominator.
+
+METHOD:: limit
+
+returns:: The limit of the ratio.
+
+METHOD:: description
+
+returns:: The ratio description.
+
+METHOD:: value
+
+returns:: The ratio described as a floating-point number.
+
+METHOD:: print
+
+returns:: The ratio described as a string.
+
+METHOD:: asMIDI
+
+returns:: An array where the first index is a MIDI note number and the second index is an offset from ET12 in cents.
+
+EXAMPLES::
+
+code::
+r = Ratio(5,4);
+r.limit;
+
+r = Ratio(ratioAsString: "5/4");
+r.limit;
+::
