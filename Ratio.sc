@@ -28,14 +28,43 @@ Ratio {
 		^Ratio(num, den);
 	}
 
+	// ***** Instance method: setDescription
+	setDescription {|aString|
+		description = aString
+	}
+
+	// ***** setRatioWithString
+	setRatioWithString {|aString|
+		if(aString.contains("/"), {
+			#num, den = aString.split($/).collect{|i| i.asInteger};
+
+			if(den != 0, {
+				value = num / den;
+				limit = this.getLimit(num, den);
+			}, {
+				"Illegal denominator!".error;
+				value = 1
+			});
+		}, {
+			"Illegal ratio name!".error
+		});
+	}
+
+	// ***** Instance method: setFav
+	setFav {|val|
+		fav = val.clip(0,1).asInteger;
+	}
+
 	// ***** Instance method: num_
 	num_{|val|
-		num = val.asInteger
+		num = val.asInteger;
+		limit = this.limit(num, den);
 	}
 
 	// ***** Instance method: den_
 	den_{|val|
-		den = val.asInteger
+		den = val.asInteger;
+		limit = this.limit(num, den);
 	}
 
 	// ***** Instance method: print
