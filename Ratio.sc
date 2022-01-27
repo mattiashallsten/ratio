@@ -1,6 +1,7 @@
 Ratio {
 	var <num, <den, <description, <fav, <ratioAsString;
 	var <value, <limit;
+	classvar gannRatios;
 
 	*new {|num = 1, den = 1, description = "", fav = 0, ratioAsString|
 		^super.newCopyArgs(num, den, description, fav, ratioAsString).initRatio
@@ -20,6 +21,10 @@ Ratio {
 		}, {
 			"Illegal denominator!".postln;
 			value = 1
+		});
+
+		if(gannRatios.isNil, {
+			this.loadGannRatios()
 		});
 	}
 
@@ -281,6 +286,21 @@ Ratio {
 		};
 
 		^aList.collect{|item| item.div(den)}
+	}
+
+	// * Instance method: loadGannRatios
+	loadGannRatios {
+		gannRatios = File(Platform.userExtensionDir ++ "/ratio/gann.json", "r").readAllString.parseJSON;
+	}
+
+	// * Instance method: getGannDesc
+	getGannDesc {
+		var forced = Ratio(num, den).forceOctave();
+		if(gannRatios[forced.asString].notNil, {
+			^gannRatios[forced.asString]
+		}, {
+			^""
+		})
 	}
 }
 
