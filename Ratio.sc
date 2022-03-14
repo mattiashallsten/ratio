@@ -7,7 +7,6 @@ Ratio {
 		^super.newCopyArgs(num, den, description, fav, ratioAsString).initRatio
 	}
 
-	// ***** Instance method: initRatio
 	initRatio {
 		if(ratioAsString.notNil, {
 			if(ratioAsString.contains("/"), {
@@ -28,12 +27,10 @@ Ratio {
 		});
 	}
 
-	// ***** Instance method: copy
 	copy {
 		^Ratio(num, den);
 	}
 
-	// ***** Instance method: setDescription
 	setDescription {|aString|
 		description = aString
 	}
@@ -47,49 +44,42 @@ Ratio {
 				value = num / den;
 				limit = this.getLimit(num, den);
 			}, {
-				"Illegal denominator!".error;
+				"Illegal denominator!".throw;
 				value = 1
 			});
 		}, {
-			"Illegal ratio name!".error
+			"Illegal ratio name!".throw
 		});
 	}
 
-	// ***** Instance method: setFav
 	setFav {|val|
 		fav = val.clip(0,1).asInteger;
 	}
 
-	// ***** Instance method: num_
 	num_{|val|
 		num = val.asInteger;
 		limit = this.limit(num, den);
 	}
 
-	// ***** Instance method: den_
 	den_{|val|
 		den = val.asInteger;
 		limit = this.limit(num, den);
 	}
 
-	// ***** Instance method: print
 	print {
 		var str = num.asString ++ "/" ++ den.asString;
 
 		^str
 	}
 
-	// ***** Instance method: asNum
 	asNum {
 		^(num / den)
 	}
 
-	// ***** Instance method: asString
 	asString {
 		^this.print()
 	}
 
-	// ***** Instance method: asMIDI
 	asMIDI {
 		var nn, dev;
 
@@ -101,7 +91,6 @@ Ratio {
 		^[nn, dev]
 	}
 
-	// ***** Instance method: getLimit
 	getLimit { | num, den |
 		var numLimit, denLimit;
 		var numFactors = num.factors.reverse;
@@ -126,7 +115,6 @@ Ratio {
 		});
 	}
 
-	// ***** Instance method: getLimit
 	multiply {|am|
 		if(am.class == Ratio, {
 			^Ratio(num * am.num, den * am.den).simplify
@@ -137,7 +125,6 @@ Ratio {
 		});
 	}
 
-	// ***** Instance method: divide
 	divide {|am|
 		if(am.class == Ratio, {
 			^Ratio(num * am.den, den * am.num).simplify
@@ -148,7 +135,6 @@ Ratio {
 		})
 	}
 
-	// ***** Instance method: add
 	add {|am|
 		if(am.class == Ratio, {
 			^Ratio(
@@ -169,7 +155,6 @@ Ratio {
 	/ {|am| ^this.divide(am) }
 	* {|am| ^this.multiply(am) }
 
-	// ***** Instance method: simplify
 	simplify {
 		var div = gcd(num, den);
 		num = num.div(div);
@@ -177,12 +162,10 @@ Ratio {
 		^this
 	}
 
-	// ***** Instance method: pow
 	pow {|aInteger|
 		^Ratio(num.pow(aInteger.asInteger).asInteger, den.pow(aInteger.asInteger).asInteger)
 	}
 
-	// ***** Instance method: forceOctave
 	forceOctave {
 		while({den > num}, {
 			num = num * 2
@@ -193,30 +176,24 @@ Ratio {
 		^this.simplify()
 	}
 
-	// ***** Instance method: invert
 	invert { ^Ratio(den, num) }
 
-	// ***** Instance method: am
 	am {
 		// arithmetic mean
 		^this.add(1).divide(2).simplify()
 	}
-	// ***** Instance method: hm
 	hm {
 		// harmonic mean
 		^this.multiply(2).divide(this.add(1)).simplify()
 	}
-	// ***** Instance method: dt
 	dt {
 		// difference tone
 		^Ratio(num - den, den)
 	}
-	// ***** Instance method: st
 	st {
 		// sum tone
 		^Ratio(num + den, den).simplify
 	}
-	// ***** Instance method: collectionWithCommonDen
 	collectionWithCommonDen {|aList|
 		var mult = [];
 		var new = [];
@@ -241,7 +218,6 @@ Ratio {
 		^this.simplifyCollectionCommonDenominator(new);
 	}
 
-	// ***** Instance method: simplifyCollectionCommonDenominator	
 	simplifyCollectionCommonDenominator {|aList|
 		var numbers = [aList[0].den] ++ aList.collect{|r| r.num};
 		var den = numbers[0];
@@ -253,7 +229,6 @@ Ratio {
 		^aList.collect{|item| Ratio(item.num.div(den), item.den.div(den))}
 	}
 
-	// ***** Instance method: collectionAsHarmonics
 	collectionAsHarmonics {|aList|
 		var mult = [];
 		var harm = [];
@@ -277,7 +252,6 @@ Ratio {
 		^this.simplifyHarmonics(harm)
 	}
 
-	// ***** Instance method: simplifyHarmonics	
 	simplifyHarmonics {|aList|
 		var den = aList[0];
 
@@ -288,22 +262,32 @@ Ratio {
 		^aList.collect{|item| item.div(den)}
 	}
 
-	// * Instance method: loadGannRatios
 	loadGannRatios {
 		gannRatios = File(Platform.userExtensionDir ++ "/ratio/gann.json", "r").readAllString.parseJSON;
 	}
 
-	// * Instance method: getGannDesc
 	getGannDesc {
-		var forced = Ratio(num, den).forceOctave();
+		var forced = Ratio(num, den);
+		var octave = 0;
+
+		while({forced.den > forced.num}, {
+			forced.num = forced.num * 2;
+			octave = octave - 1;
+		});
+		while({forced.num > (forced.den * 2)}, {
+			forced.den = forced.den * 2;
+			octave = octave + 1;
+		});
+		
+		forced.simplify;
+		
 		if(gannRatios[forced.asString].notNil, {
-			^gannRatios[forced.asString]
+			^(gannRatios[forced.asString]
+				++ if(octave > 0, { " (+ " ++ octave.asString ++ " octaves)"}, {
+					if(octave < 0, { " (- " ++ octave.abs.asString ++ " octaves)"}, {
+						""})}));
 		}, {
 			^""
 		})
 	}
 }
-
-// Local variables:
-// eval: (outshine-mode t)
-// End:
